@@ -1,0 +1,10 @@
+# .gitmodules - PCaNet
+#
+# SPDX-FileCopyrightText: Copyright (C) 2022 Frank C Langbein <frank@langbein.org>, Cardiff University
+# SPDX-License-Identifier: AGPL-3.0-or-later
+[submodule "datasets"]
+	path = datasets
+  url = git@qyber.black:ca/data-pca-ds.git
+[submodule "models"]
+	path = models-classify
+  url = git@qyber.black:ca/data-pcanet-models.git
