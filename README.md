@@ -1,8 +1,8 @@
 # PCaNet
 
-> SPDX-FileCopyrightText: Copyright (C) 2021-2023 Asmail Muftah <MuftahA@cardiff.ac.uk>, PhD student at Cardiff University
-> SPDX-FileCopyrightText: Copyright (C) 2020-2024 Frank C Langbein <frank@langbein.org>, Cardiff University  
-> SPDX-FileCopyrightText: Copyright (C) 2020-2022 S Shermer <lw1660@gmail.com>, Swansea University
+> SPDX-FileCopyrightText: Copyright (C) 2021-2023 Asmail Muftah <MuftahA@cardiff.ac.uk>, PhD student at Cardiff University\
+> SPDX-FileCopyrightText: Copyright (C) 2020-2024 Frank C Langbein <frank@langbein.org>, Cardiff University\
+> SPDX-FileCopyrightText: Copyright (C) 2020-2022 S Shermer <lw1660@gmail.com>, Swansea University\
 > SPDX-License-Identifier: AGPL-3.0-or-later
 
 Code for classification and segmentation of prostate cancer.
