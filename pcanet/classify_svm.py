@@ -22,7 +22,7 @@ class SVMClassifier:
     self.model = model
     self.verbose = verbose
     if classifier is None:
-      self.estimator = SVC(kernel=kernel, C=C, gamma="scale", max_iter=100000, tol=1e-6, verbose=(verbose>2))
+      self.estimator = SVC(kernel=kernel, C=C, gamma="scale", max_iter=100000, tol=1e-6, probability=True, verbose=(verbose>2))
     else:
       self.estimator = classifier
     self.estimator.pca = {
@@ -155,8 +155,8 @@ class SVMClassifier:
       if self.verbose > 0:
         print(f"    Train set: {X_train.shape[0]}, Test set: {X_test.shape[0]}")
       self.estimator.fit(X_train, Y_train)
-      scores_train = self.estimator.decision_function(X_train)
-      scores_test = self.estimator.decision_function(X_test)
+      scores_train = self.estimator.predict_proba(X_train)
+      scores_test = self.estimator.predict_proba(X_test)
       fpr_train, tpr_train, auc_train, thres_train = {}, {}, {}, {}
       fpr_test, tpr_test, auc_test, thres_test = {}, {}, {}, {}
       for l in range(num_classes):
@@ -164,16 +164,13 @@ class SVMClassifier:
         auc_train[l] = auc(fpr_train[l], tpr_train[l])
         fpr_test[l], tpr_test[l], thres_test[l] = roc_curve(Y_test == l, scores_test[:,l])
         auc_test[l] = auc(fpr_test[l], tpr_test[l])
-      # Does not work for SVM and multi-class without further changes (computing probabilities),
-      # but these could affect the binary classification results which could affect comparison,
-      # so we leave this out for multi-class
-      #if num_classes > 2:
-      #  # AUC micro-average
-      #  auc_test["micro"] = roc_auc_score(Y_test, scores_test, multi_class="ovr", average="micro")
-      #  auc_train["micro"] = roc_auc_score(Y_train, scores_train, multi_class="ovr", average="micro")
-      #  # AUC macro-average (all classes treated equally a-priori vs. micro-average)
-      #  auc_test["macro"] = roc_auc_score(Y_test, scores_test, multi_class="ovr", average="macro")
-      #  auc_train["macro"] = roc_auc_score(Y_train, scores_train, multi_class="ovr", average="macro")
+      if num_classes > 2:
+        # AUC micro-average
+        auc_test["micro"] = roc_auc_score(Y_test, scores_test, multi_class="ovr", average="micro")
+        auc_train["micro"] = roc_auc_score(Y_train, scores_train, multi_class="ovr", average="micro")
+        # AUC macro-average (all classes treated equally a-priori vs. micro-average)
+        auc_test["macro"] = roc_auc_score(Y_test, scores_test, multi_class="ovr", average="macro")
+        auc_train["macro"] = roc_auc_score(Y_train, scores_train, multi_class="ovr", average="macro")
       predictions["train"].append((self.estimator.predict(X_train),Y_train,P_train,
                                    (fpr_train, tpr_train, thres_train, auc_train)))
       predictions["test"].append((self.estimator.predict(X_test),Y_test,P_test,
@@ -198,20 +195,17 @@ class SVMClassifier:
       X = self.estimator.pca['normalise_scaler'].transform(X)
     Y_pred = self.estimator.predict(X)
     if Y is not None and evaluate:
-      scores = normalize(self.estimator.decision_function(X), axis=1, norm='l1')
+      scores = normalize(self.estimator.predict_proba(X), axis=1, norm='l1')
       fpr, tpr, aucv, thres = {}, {}, {}, {}
       num_classes = np.unique(Y).shape[0]
       for l in range(num_classes):
         fpr[l], tpr[l], thres[l] = roc_curve(Y == l, scores[:,l])
         aucv[l] = auc(fpr[l], tpr[l])
-      # Does not work for SVM and multi-class without further changes (computing probabilities),
-      # but these could affect the binary classification results which could affect comparison,
-      # so we leave this out for multi-class
-      #if num_classes > 2:
-      #  # AUC micro-average
-      #  aucv["micro"] = roc_auc_score(Y, scores, multi_class="ovr", average="micro")
-      #  # AUC macro-average (all classes treated equally a-priori vs. micro-average)
-      #  aucv["macro"] = roc_auc_score(Y, scores, multi_class="ovr", average="macro")
+      if num_classes > 2:
+        # AUC micro-average
+        aucv["micro"] = roc_auc_score(Y, scores, multi_class="ovr", average="micro")
+        # AUC macro-average (all classes treated equally a-priori vs. micro-average)
+        aucv["macro"] = roc_auc_score(Y, scores, multi_class="ovr", average="macro")
       roc_data = (fpr, tpr, thres, aucv)
     else:
       roc_data = None

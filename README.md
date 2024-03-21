@@ -1,14 +1,18 @@
 # PCaNet
 
 > SPDX-FileCopyrightText: Copyright (C) 2021-2023 Asmail Muftah <MuftahA@cardiff.ac.uk>, PhD student at Cardiff University
-> SPDX-FileCopyrightText: Copyright (C) 2020-2023 Frank C Langbein <frank@langbein.org>, Cardiff University  
+> SPDX-FileCopyrightText: Copyright (C) 2020-2024 Frank C Langbein <frank@langbein.org>, Cardiff University  
 > SPDX-FileCopyrightText: Copyright (C) 2020-2022 S Shermer <lw1660@gmail.com>, Swansea University
 > SPDX-License-Identifier: AGPL-3.0-or-later
 
 Code for classification and segmentation of prostate cancer.
 
 The main functions are in the pcanet module. We provide jupyter notebook and
-command line interfaces, as needed/used.
+command line interfaces, as needed/used. The results are in separate repositories:
+  * https://qyber.black/ca/results-pcanet-models-classification
+Some repositories are submodules. Note that they may be quite large.
+
+Also note that the data repositories may not be public due to distribution limitations.
 
 # Install Instructions (Linux)
 
@@ -31,6 +35,14 @@ Linux and may not work on another platform.
    ```
    git submodule update --init --recursive
    ```
+   Note, some of the sub-modules are quite large and may not be accessible (if
+   we cannot distribute the data; sometimes you may be able to get the data
+   from the original source and use the tools from 
+   [code-qdicom-utilities](https://qyber.black/ca/code-qdicom-utilities)
+   to convert the original files to a suitable data format). It may also be
+   best to set `GIT_LFS_SKIP_SMUDGE=1` to avoid the large data files are 
+   downloaded via LFS and then pull only specific LFS files with
+   `git lfs pull -I PATH` that you need.
 4. Install the requirements:
    ```
    pip3 install -r requirements.txt
@@ -38,8 +50,8 @@ Linux and may not work on another platform.
    Note that the requirements may need additional libraries, etc. to be
    installed on you system that pip does not add automatically. Also note,
    that some packages (in particular mahotas), may not be available at
-   the requested version if you are use a more recent version of python
-   (python3.10) - these pacakges can still be installed from source; obtain
+   the requested version if you are using a more recent version of python
+   (python3.10) - these packages can still be installed from source; obtain
    the sources and checkout the version requested and run `python3
    setup.py install --prefix=~/.local` or similar.
 

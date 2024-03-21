@@ -5,6 +5,6 @@
 [submodule "datasets"]
 	path = datasets
   url = git@qyber.black:ca/data-pca-ds.git
-[submodule "models"]
+[submodule "models-classify"]
 	path = models-classify
   url = git@qyber.black:ca/data-pcanet-models.git
