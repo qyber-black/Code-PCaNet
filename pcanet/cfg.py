@@ -1,6 +1,6 @@
 # pcanet/cfg.py - PCaNet - config
 #
-# SPDX-FileCopyrightText: Copyright (C) 2021-2023 Frank C Langbein <frank@langbein.org>, Cardiff University
+# SPDX-FileCopyrightText: Copyright (C) 2021-2024 Frank C Langbein <frank@langbein.org>, Cardiff University
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 import os
@@ -26,7 +26,10 @@ class Cfg:
     'beta1': 0.9, # Adam beta1
     'beta2': 0.999, # Adam beta2
     'epsilon': 1e-8, # Adam epsilon
-    'logits_calibration_percentage': 0.1 # Percentage of train data used for calibration only
+    'logits_calibration_percentage': 0.1, # Percentage of train data used for calibration only
+    'py_seed': None, # Global python seed
+    'tf_seed': None, # Global tensorflow seed
+    'tf_deterministic': False # Make tensorflow deterministic
   }
   # Development flags for extra functionalities and test (not relevant for use).
   # These are set via the environment varaible MRSNET_DEV (colon separated list),
@@ -83,6 +86,8 @@ class Cfg:
     if 'OCANET_DEV' in os.environ:
       for f in os.environ['PCANET_DEV'].split(":"):
         Cfg.dev_flags.add(f)
+    # Set seeds
+    Cfg.set_seeds()
 
   @staticmethod
   def dev(flag):
@@ -105,3 +110,39 @@ class Cfg:
       return dpi # set in cfg.json if this is not working
     except:
       return Cfg.val['default_screen_dpi']
+
+  @staticmethod
+  def py_seed(seed):
+    # Initialize seeds for python libraries with stochastic behavior
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    import random
+    random.seed(seed)
+    import numpy as np
+    np.random.seed(seed)
+
+  @staticmethod
+  def tf_seed(seed, deterministic):
+    # Initialise global seed and determinism for tensorflow
+    if deterministic:
+      # Deterministic operations in tensorflow
+      os.environ['TF_DETERMINISTIC_OPS'] = '1'
+      os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+    import tensorflow as tf
+    tf.random.set_seed(seed)
+    if deterministic:
+      # Deterministic operations in tensorflow
+      tf.config.threading.set_inter_op_parallelism_threads(1)
+      tf.config.threading.set_intra_op_parallelism_threads(1)
+      tf.config.experimental.enable_op_determinism()
+
+  @staticmethod
+  def set_seeds(pseed="cfg", tseed="cfg", tdet="cfg"):
+    # Set all seeds using Cfg values if not specified
+    if pseed == "cfg":
+      pseed = Cfg.val['py_seed']
+    if tseed == "cfg":
+      tseed = Cfg.val['tf_seed']
+    if tdet == "cfg":
+      tdet = Cfg.val['tf_deterministic']
+    Cfg.py_seed(pseed)
+    Cfg.tf_seed(tseed, tdet)

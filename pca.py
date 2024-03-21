@@ -407,16 +407,17 @@ def view(args):
   plt.show(block=True)
 
 if __name__ == '__main__':
+  # Only print warnings and errors for tf (set before importing tf)
+  if 'TF_CPP_MIN_LOG_LEVEL' not in os.environ:
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # Do not print info and warning, but errors
   # Find base folder
   if not os.name == 'posix':
     print("**WARNING - PCaNet only runs reliably and is only supported on Linux/POSIX**")
   bin_path = os.path.realpath(__file__)
   if not os.path.isfile(bin_path):
     raise Exception("Cannot find location of mrsnet.py root folder")
+  # Initialise cfg
   Cfg.init(bin_path)
-  # Only print warnings and errors for tf (set before importing tf)
-  if 'TF_CPP_MIN_LOG_LEVEL' not in os.environ:
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
   # Headless mode
   if not "DISPLAY" in os.environ:
     from matplotlib import use

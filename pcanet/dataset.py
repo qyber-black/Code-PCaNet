@@ -237,7 +237,19 @@ class ClassifyDataset:
       for l in range(0,len(self.channels)):
         if self.channels[l] not in channels:
           raise Exception(f"Channel {self.channels[l]} not in dataset")
-        self._ch_idx[l] = found_channels.index(self.channels[l])
+        try:
+          self._ch_idx[l] = found_channels.index(self.channels[l])
+        except:
+           # Match dwi_c channel even if strength does not match
+           found = False
+           if self.channels[l][:6] == 'dwi_c-':
+             for idx, fch in enumerate(found_channels):
+               if fch[:6] == 'dwi_c-':
+                 self._ch_idx[l] = idx
+                 found = True
+                 break
+           if not found:
+             raise Exception(f"Channel {self.channels[l]} not in data")
     else:
       self.channels = found_channels
       self._ch_idx = np.arange(0,len(self.channels))

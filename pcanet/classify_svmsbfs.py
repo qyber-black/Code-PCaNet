@@ -222,7 +222,11 @@ class SVMSBFSClassifier:
     if Y is not None and evaluate:
       scores = self.estimator.decision_function(X[:,self.estimator.pca['features']])
       fpr, tpr, aucv, thres = {}, {}, {}, {}
-      num_classes = np.unique(Y).shape[0]
+      if len(scores.shape) == 1:
+        num_classes = 1
+        scores = np.expand_dims(scores, axis=1)
+      else:
+        num_classes = scores.shape[2]
       for l in range(num_classes):
         fpr[l], tpr[l], thres[l] = roc_curve(Y == l, scores[:,l])
         aucv[l] = auc(fpr[l], tpr[l])
@@ -243,7 +247,7 @@ class SVMSBFSClassifier:
     # Names of features
     if self.estimator.pca['features'] is None:
       return []
-    names = texture.texture_feature_names(self.estimator.pca['channels'], self.estimator.pca['inp_features'])
+    names = texture.texture_feature_names(self.estimator.pca['channels'], self.estimator.pca['inp_features'], self.estimator.pca['patch_size'])
     return [names[l] for l in self.estimator.pca['features']]
 
   @staticmethod

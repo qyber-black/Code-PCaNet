@@ -90,6 +90,9 @@ def texture_feature_names(channels, inp_features, size):
   # We need to reconstruct the shapes, so this is complex
   # First get the texture features and collect CNN feature names
   cnn_features = []
+  first_order = False
+  haralick = False
+  lbp = False
   for inf in inp_features.split("_"):
     inf = inf.lower()
     if inf == "first":
@@ -200,6 +203,7 @@ def compute_features(ds, inp_features, size, norm_slices=False, parallel=True, v
                              lbp=lbp)
              for pid in ds.slices[tag]]
     feature_total = np.sum([len(a) for a in res])
+
     # CNN features
     if len(cnn_features) > 0:
       fpid = next(iter(res[0]))
